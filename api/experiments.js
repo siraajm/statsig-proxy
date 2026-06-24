@@ -1,29 +1,25 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
-  const apiKey = process.env.STATSIG_API_KEY;
-  const { page = 1, limit = 100 } = req.query;
+  const STATSIG_KEY = process.env.STATSIG_SERVER_SECRET_KEY;
 
   try {
-    const response = await fetch(
-      `https://statsigapi.net/console/v1/experiments?limit=${limit}&page=${page}`,
-      {
-        headers: {
-          'STATSIG-API-KEY': apiKey,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await fetch('https://statsigapi.net/console/v1/experiments', {
+      headers: {
+        'STATSIG-API-KEY': STATSIG_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
+
     const data = await response.json();
-    res.status(200).json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(response.status).json(data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 }
