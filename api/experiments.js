@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const STATSIG_KEY = process.env.STATSIG_SERVER_SECRET_KEY;
+  const STATSIG_KEY = process.env.STATSIG_API_KEY;
 
   try {
     const response = await fetch('https://statsigapi.net/console/v1/experiments', {
